@@ -25,7 +25,7 @@ In **Settings → Private notification archive**, configure:
 4. additional comma-separated excluded package names;
 5. **Sync enabled**.
 
-The API token is stored with Android Keystore-backed encrypted preferences. Banking, authenticator, and password-manager package defaults are excluded from server sync. The existing app blacklist remains available for broader capture exclusions.
+The API token is stored with Android Keystore-backed encrypted preferences. Authenticator and password-manager package defaults are excluded from server sync. Banking notifications are supported for payment context but carry an explicit settings warning and can be excluded by package. The existing app blacklist remains available for broader capture exclusions.
 
 The server lives in [`api/`](api/) and exposes:
 

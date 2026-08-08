@@ -26,9 +26,7 @@ object SyncPreferences {
         "com.authy.authy",
         "com.onepassword.android",
         "com.lastpass.lpandroid",
-        "com.bitwarden.android",
-        "pl.pkobp.iko",
-        "com.zenithbank.eazymoney"
+        "com.bitwarden.android"
     )
 
     private fun secure(context: Context) = EncryptedSharedPreferences.create(
