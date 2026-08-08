@@ -26,6 +26,42 @@
         </Preference>
 
     </PreferenceCategory>
+    <PreferenceCategory app:title="@string/sync_archive">
+        <SwitchPreferenceCompat
+            app:defaultValue="false"
+            app:key="sync_enabled"
+            app:summary="@string/sync_enabled_summary"
+            app:title="@string/sync_enabled" />
+        <EditTextPreference
+            app:key="sync_server_url"
+            app:summary="@string/sync_server_url_summary"
+            app:title="@string/sync_server_url"
+            app:useSimpleSummaryProvider="true" />
+        <EditTextPreference
+            app:key="sync_api_token"
+            app:summary="@string/sync_api_token_missing"
+            app:title="@string/sync_api_token" />
+        <EditTextPreference
+            app:defaultValue="Android phone"
+            app:key="sync_device_name"
+            app:title="@string/sync_device_name"
+            app:useSimpleSummaryProvider="true" />
+        <SwitchPreferenceCompat
+            app:defaultValue="false"
+            app:key="sync_wifi_only"
+            app:title="@string/sync_wifi_only" />
+        <EditTextPreference
+            app:key="sync_excluded_packages"
+            app:summary="@string/sync_excluded_packages_summary"
+            app:title="@string/sync_excluded_packages" />
+        <EditTextPreference
+            app:defaultValue="0"
+            app:key="sync_retention_days"
+            app:summary="@string/sync_retention_summary"
+            app:title="@string/sync_retention" />
+        <Preference app:key="sync_now" app:title="@string/sync_now" />
+        <Preference app:key="sync_status" app:title="@string/sync_status" />
+    </PreferenceCategory>
     <PreferenceCategory app:title="@string/app_list">
         <Preference
             app:key="autodetect_installed_apps"

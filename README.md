@@ -1,4 +1,4 @@
-﻿# Notifications Recovery
+﻿# Notification Archive
 
  ![primo_piano.png](img/primo_piano.png)
 
@@ -13,7 +13,40 @@
 
 <h2> Description </h2>
 
-This app saves your Android device`s notifications and allows you not to miss notifications that are accidentally deleted or that are deleted by the apps themselves. Feel free to recommend new features.
+This private fork keeps the original on-device notification history and adds a reliable Android → HTTPS API → PostgreSQL archive. Every sync event is stored in ObjectBox before WorkManager attempts a network request. UUID-based inserts make retries idempotent.
+
+## Archive setup
+
+In **Settings → Private notification archive**, configure:
+
+1. the HTTPS server URL;
+2. a bearer API token;
+3. a device name and optional Wi-Fi-only mode;
+4. additional comma-separated excluded package names;
+5. **Sync enabled**.
+
+The API token is stored with Android Keystore-backed encrypted preferences. Banking, authenticator, and password-manager package defaults are excluded from server sync. The existing app blacklist remains available for broader capture exclusions.
+
+The server lives in [`api/`](api/) and exposes:
+
+- `GET /api/v1/health`
+- `POST /api/v1/notifications/batch`
+- `GET /api/v1/notifications?q=&package_name=&device_id=&event_type=&since=&limit=`
+- `GET /api/v1/sync/status`
+
+All notification endpoints require `Authorization: Bearer <API_TOKEN>`. PostgreSQL is reached only by the API and uses idempotent `event_id` inserts. The schema and indexes are applied on API startup.
+
+### Server environment
+
+```text
+DATABASE_URL=postgresql://USER:PASSWORD@HOST:5432/notification_archive
+API_TOKEN=<at-least-32-character-random-token>
+MAX_REQUEST_BYTES=1048576
+RATE_LIMIT_PER_MINUTE=120
+LOG_LEVEL=INFO
+```
+
+Build the API with the root `Dockerfile`. Back up and restore the database with the platform's PostgreSQL backup tooling; test restores into a separate database before relying on them.
 
 <h2>📲 Features</h2>
 

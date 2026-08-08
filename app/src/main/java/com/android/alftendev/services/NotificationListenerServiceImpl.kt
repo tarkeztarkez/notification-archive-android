@@ -7,6 +7,7 @@ import android.service.notification.NotificationListenerService
 import android.service.notification.StatusBarNotification
 import androidx.collection.LruCache
 import com.android.alftendev.MyApplication
+import com.android.alftendev.models.SyncEvent
 import com.android.alftendev.services.utils.NotiUtils.isAutoBlacklistedNotification
 import com.android.alftendev.services.utils.NotiUtils.shouldDropByDefaultBlacklist
 import com.android.alftendev.services.utils.NotiUtils.shouldDropByPackage
@@ -19,6 +20,10 @@ import com.android.alftendev.utils.DBUtils.searchOneNot
 import com.android.alftendev.utils.MySharedPref
 import com.android.alftendev.utils.NotificationsUtils.sendNotification
 import com.android.alftendev.utils.computables.PackageSettingsCache.packageNameExists
+import com.android.alftendev.sync.SyncPreferences
+import com.android.alftendev.sync.SyncScheduler
+import org.json.JSONObject
+import java.util.UUID
 import java.util.concurrent.Executors
 
 class NotificationListenerServiceImpl : NotificationListenerService() {
@@ -36,6 +41,7 @@ class NotificationListenerServiceImpl : NotificationListenerService() {
 
     private val notiExecutor = Executors.newSingleThreadExecutor()
     private val recentNotificationsCache = LruCache<String, LastNotiData>(30)
+    private val activeNotificationKeys = HashSet<String>()
 
     companion object {
         val LOGGER = CustomLog("not-listener")
@@ -55,6 +61,8 @@ class NotificationListenerServiceImpl : NotificationListenerService() {
             val notificationExtras = safeSbn.notification.extras ?: return@execute
 
             val notificationData = getNotificationFromExtras(notificationExtras)
+            val eventType = if (activeNotificationKeys.add(safeSbn.key)) "posted" else "updated"
+            saveSyncEvent(safeSbn, notificationData, eventType)
 
             if (notificationData.title.isEmpty() && notificationData.text.isEmpty()) {
                 return@execute
@@ -136,6 +144,8 @@ class NotificationListenerServiceImpl : NotificationListenerService() {
             val notificationExtras = safeSbn.notification?.extras ?: return@execute
 
             val notificationData = getNotificationFromExtras(notificationExtras)
+            activeNotificationKeys.remove(safeSbn.key)
+            saveSyncEvent(safeSbn, notificationData, "removed")
 
             val entity =
                 searchOneNot(
@@ -231,5 +241,49 @@ class NotificationListenerServiceImpl : NotificationListenerService() {
             peopleList = peopleList as String,
             titleBig = titleBig
         )
+    }
+
+    private fun saveSyncEvent(
+        sbn: StatusBarNotification,
+        data: NotificationData,
+        eventType: String
+    ) {
+        if (!SyncPreferences.isEnabled() || SyncPreferences.isExcluded(sbn.packageName)) return
+        val appName = try {
+            packageManager.getApplicationLabel(packageManager.getApplicationInfo(sbn.packageName, 0)).toString()
+        } catch (_: Exception) {
+            sbn.packageName
+        }
+        val now = System.currentTimeMillis()
+        val notification = sbn.notification
+        val raw = JSONObject()
+            .put("flags", notification.flags)
+            .put("is_clearable", sbn.isClearable)
+            .put("is_ongoing", sbn.isOngoing)
+            .put("post_time", sbn.postTime)
+        val event = SyncEvent(
+            eventId = UUID.randomUUID().toString(),
+            deviceId = SyncPreferences.deviceId(this),
+            deviceName = SyncPreferences.deviceName(),
+            packageName = sbn.packageName,
+            appName = appName,
+            notificationKey = sbn.key,
+            notificationId = sbn.id,
+            notificationTag = sbn.tag,
+            title = data.title,
+            body = data.text,
+            expandedText = data.bigText,
+            subtext = data.infoText,
+            category = notification.category,
+            channelId = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) notification.channelId else null,
+            groupKey = sbn.groupKey,
+            postedAt = sbn.postTime,
+            capturedAt = now,
+            removedAt = if (eventType == "removed") now else null,
+            eventType = eventType,
+            rawMetadataJson = raw.toString()
+        )
+        MyApplication.syncEvents.put(event)
+        SyncScheduler.enqueue(this)
     }
 }

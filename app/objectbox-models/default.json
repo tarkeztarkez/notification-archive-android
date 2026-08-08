@@ -110,10 +110,151 @@
         }
       ],
       "relations": []
+    },
+    {
+      "id": "3:3510444239300525768",
+      "lastPropertyId": "26:2593498787044665473",
+      "name": "SyncEvent",
+      "properties": [
+        {
+          "id": "1:4300072611635514772",
+          "name": "id",
+          "type": 6,
+          "flags": 1
+        },
+        {
+          "id": "2:8496722535437434451",
+          "name": "eventId",
+          "indexId": "6:5874999368059784795",
+          "type": 9,
+          "flags": 2080
+        },
+        {
+          "id": "3:9101529550769967301",
+          "name": "deviceId",
+          "type": 9
+        },
+        {
+          "id": "4:1253261420417800602",
+          "name": "deviceName",
+          "type": 9
+        },
+        {
+          "id": "5:8469589802516322938",
+          "name": "packageName",
+          "type": 9
+        },
+        {
+          "id": "6:1496743760259560214",
+          "name": "appName",
+          "type": 9
+        },
+        {
+          "id": "7:3374422200387987337",
+          "name": "notificationKey",
+          "type": 9
+        },
+        {
+          "id": "8:4004286012901158605",
+          "name": "notificationId",
+          "type": 5
+        },
+        {
+          "id": "9:8868422477687453020",
+          "name": "notificationTag",
+          "type": 9
+        },
+        {
+          "id": "10:6944323068382400193",
+          "name": "title",
+          "type": 9
+        },
+        {
+          "id": "11:1095934541900010788",
+          "name": "body",
+          "type": 9
+        },
+        {
+          "id": "12:8070043891817905001",
+          "name": "expandedText",
+          "type": 9
+        },
+        {
+          "id": "13:8619058317542833320",
+          "name": "subtext",
+          "type": 9
+        },
+        {
+          "id": "14:2832531009320584623",
+          "name": "category",
+          "type": 9
+        },
+        {
+          "id": "15:4136220753634323908",
+          "name": "channelId",
+          "type": 9
+        },
+        {
+          "id": "16:2201745204331783047",
+          "name": "groupKey",
+          "type": 9
+        },
+        {
+          "id": "17:119599695494693815",
+          "name": "postedAt",
+          "type": 6
+        },
+        {
+          "id": "18:238925981906948045",
+          "name": "capturedAt",
+          "type": 6
+        },
+        {
+          "id": "19:7424946789021459139",
+          "name": "removedAt",
+          "type": 6
+        },
+        {
+          "id": "20:2054850708489818254",
+          "name": "eventType",
+          "type": 9
+        },
+        {
+          "id": "21:8049323301729091895",
+          "name": "rawMetadataJson",
+          "type": 9
+        },
+        {
+          "id": "22:8637180383151243068",
+          "name": "syncState",
+          "type": 9
+        },
+        {
+          "id": "23:3252157181353785260",
+          "name": "syncedAt",
+          "type": 6
+        },
+        {
+          "id": "24:2168871602788302704",
+          "name": "syncAttempts",
+          "type": 5
+        },
+        {
+          "id": "25:6094354377015934358",
+          "name": "lastSyncError",
+          "type": 9
+        },
+        {
+          "id": "26:2593498787044665473",
+          "name": "payloadVersion",
+          "type": 5
+        }
+      ],
+      "relations": []
     }
   ],
-  "lastEntityId": "2:8902696152457388726",
-  "lastIndexId": "5:1481003158506231486",
+  "lastEntityId": "3:3510444239300525768",
+  "lastIndexId": "6:5874999368059784795",
   "lastRelationId": "0:0",
   "lastSequenceId": "0:0",
   "modelVersion": 5,

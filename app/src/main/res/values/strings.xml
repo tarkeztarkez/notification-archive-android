@@ -157,4 +157,20 @@
     <string name="autodetect" translatable="false">Autodetect</string>
     <string name="automatically_find_your_apps_so_you_can_manage_them_in_the_blacklist_and_whitelist">Automatically find your installed apps so you can manage them in the blacklist and whitelist.</string>
     <string name="do_you_want_to_automatically_find_your_apps_so_you_can_manage_them_in_the_blacklist_and_whitelist">Do you want to automatically find your installed apps so you can manage them in the blacklist and whitelist?</string>
+    <string name="sync_archive">Private notification archive</string>
+    <string name="sync_enabled">Sync enabled</string>
+    <string name="sync_enabled_summary">Archive new notification events on your private server</string>
+    <string name="sync_server_url">Server URL</string>
+    <string name="sync_server_url_summary">HTTPS URL of the archive API</string>
+    <string name="sync_api_token">API token</string>
+    <string name="sync_api_token_missing">Not configured</string>
+    <string name="sync_api_token_saved">Saved securely</string>
+    <string name="sync_device_name">Device name</string>
+    <string name="sync_wifi_only">Wi-Fi only</string>
+    <string name="sync_excluded_packages">Additional excluded packages</string>
+    <string name="sync_excluded_packages_summary">Comma-separated package names. Banking, authenticator and password manager defaults are always excluded.</string>
+    <string name="sync_retention">Local synced-event retention (days)</string>
+    <string name="sync_retention_summary">0 keeps local sync records forever</string>
+    <string name="sync_now">Sync now</string>
+    <string name="sync_status">Sync status</string>
 </resources>

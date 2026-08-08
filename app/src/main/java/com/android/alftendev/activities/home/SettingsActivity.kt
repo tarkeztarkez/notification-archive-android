@@ -9,6 +9,7 @@ import androidx.activity.addCallback
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.edit
 import androidx.preference.ListPreference
+import androidx.preference.EditTextPreference
 import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
 import androidx.preference.SwitchPreferenceCompat
@@ -40,6 +41,9 @@ import com.android.alftendev.utils.UiUtils.setTheme
 import com.android.alftendev.utils.UiUtils.uiDefaultSettings
 import com.android.alftendev.utils.Utils
 import com.android.alftendev.utils.computables.PackageSettingsCache
+import com.android.alftendev.models.SyncEvent
+import com.android.alftendev.sync.SyncPreferences
+import com.android.alftendev.sync.SyncScheduler
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlin.system.exitProcess
 
@@ -76,6 +80,8 @@ class SettingsActivity : AppCompatActivity() {
         @SuppressLint("ApplySharedPref")
         override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
             setPreferencesFromResource(R.xml.root_preferences, rootKey)
+
+            configureSyncPreferences()
 
             val isNotificationRecordingServiceEnabled =
                 findPreference<Preference>("is_record_notification_permission_enabled")
@@ -597,6 +603,65 @@ class SettingsActivity : AppCompatActivity() {
             if (version != null) {
                 version.title = "${version.title} ${BuildConfig.VERSION_NAME}"
             }
+        }
+
+        private fun configureSyncPreferences() {
+            val enabled = findPreference<SwitchPreferenceCompat>(SyncPreferences.KEY_ENABLED)
+            enabled?.setOnPreferenceChangeListener { _, value ->
+                if (value as Boolean) {
+                    SyncScheduler.schedulePeriodic(requireContext())
+                    SyncScheduler.enqueueManual(requireContext())
+                }
+                true
+            }
+
+            findPreference<SwitchPreferenceCompat>(SyncPreferences.KEY_WIFI_ONLY)
+                ?.setOnPreferenceChangeListener { _, _ ->
+                    SyncScheduler.schedulePeriodic(requireContext())
+                    true
+                }
+
+            val token = findPreference<EditTextPreference>("sync_api_token")
+            token?.isPersistent = false
+            token?.summary = if (SyncPreferences.hasToken(requireContext())) {
+                getString(R.string.sync_api_token_saved)
+            } else {
+                getString(R.string.sync_api_token_missing)
+            }
+            token?.setOnBindEditTextListener { editText ->
+                editText.inputType = android.text.InputType.TYPE_CLASS_TEXT or
+                    android.text.InputType.TYPE_TEXT_VARIATION_PASSWORD
+                editText.setText("")
+            }
+            token?.setOnPreferenceChangeListener { preference, value ->
+                SyncPreferences.setToken(requireContext(), value.toString())
+                preference.summary = if (value.toString().isBlank()) {
+                    getString(R.string.sync_api_token_missing)
+                } else {
+                    getString(R.string.sync_api_token_saved)
+                }
+                false
+            }
+
+            findPreference<Preference>("sync_now")?.setOnPreferenceClickListener {
+                SyncScheduler.enqueueManual(requireContext())
+                UiUtils.showToast(getString(R.string.sync_now), myActivity)
+                updateSyncStatus()
+                true
+            }
+            updateSyncStatus()
+        }
+
+        private fun updateSyncStatus() {
+            val events = MyApplication.syncEvents.all
+            val pending = events.count { it.syncState == SyncEvent.STATE_PENDING || it.syncState == SyncEvent.STATE_SYNCING }
+            val failed = events.count { it.syncState == SyncEvent.STATE_FAILED }
+            val lastSuccess = MyApplication.sharedPref.getLong("sync_last_success", 0)
+            val lastError = MyApplication.sharedPref.getString("sync_last_error", null)
+            val last = if (lastSuccess == 0L) "never" else java.text.DateFormat.getDateTimeInstance().format(lastSuccess)
+            findPreference<Preference>("sync_status")?.summary =
+                "Pending: $pending · Failed: $failed\nLast success: $last" +
+                    if (lastError.isNullOrBlank()) "" else "\nLast error: $lastError"
         }
     }
 
