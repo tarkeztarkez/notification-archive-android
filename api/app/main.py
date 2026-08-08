@@ -136,5 +136,6 @@ async def list_notifications(
 async def sync_status(request: Request):
     sql = "SELECT count(*) AS total, max(received_at) AS last_received_at, count(DISTINCT device_id) AS devices FROM notifications"
     async with request.app.state.pool.connection() as conn:
-        cursor = await conn.execute(sql, row_factory=dict_row)
+        cursor = conn.cursor(row_factory=dict_row)
+        await cursor.execute(sql)
         return await cursor.fetchone()
