@@ -23,7 +23,7 @@ android {
 
     defaultConfig {
         resourceConfigurations += ['en', 'it-rIT']
-        applicationId "com.alftendev.notlistener"
+        applicationId "com.marcinszyda.notificationarchive"
         minSdk 24
         targetSdk 36
         versionCode 50
