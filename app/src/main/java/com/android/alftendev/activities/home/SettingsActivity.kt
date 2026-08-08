@@ -608,17 +608,23 @@ class SettingsActivity : AppCompatActivity() {
         private fun configureSyncPreferences() {
             val enabled = findPreference<SwitchPreferenceCompat>(SyncPreferences.KEY_ENABLED)
             enabled?.setOnPreferenceChangeListener { _, value ->
-                if (value as Boolean) {
+                val isEnabled = value as Boolean
+                SyncPreferences.setEnabled(isEnabled)
+                enabled.isChecked = isEnabled
+                if (isEnabled) {
                     SyncScheduler.schedulePeriodic(requireContext())
                     SyncScheduler.enqueueManual(requireContext())
                 }
-                true
+                false
             }
 
             findPreference<SwitchPreferenceCompat>(SyncPreferences.KEY_WIFI_ONLY)
-                ?.setOnPreferenceChangeListener { _, _ ->
+                ?.setOnPreferenceChangeListener { preference, value ->
+                    val wifiOnly = value as Boolean
+                    SyncPreferences.setWifiOnly(wifiOnly)
+                    (preference as SwitchPreferenceCompat).isChecked = wifiOnly
                     SyncScheduler.schedulePeriodic(requireContext())
-                    true
+                    false
                 }
 
             val token = findPreference<EditTextPreference>("sync_api_token")

@@ -97,8 +97,7 @@ class SyncWorker(context: Context, params: WorkerParameters) : CoroutineWorker(c
     }
 
     private fun applyLocalRetention(now: Long) {
-        val days = MyApplication.sharedPref.getString(SyncPreferences.KEY_RETENTION_DAYS, "0")
-            ?.toIntOrNull()?.coerceAtLeast(0) ?: 0
+        val days = SyncPreferences.retentionDays()
         if (days == 0) return
         val cutoff = now - TimeUnit.DAYS.toMillis(days.toLong())
         val expired = MyApplication.syncEvents.all.filter {

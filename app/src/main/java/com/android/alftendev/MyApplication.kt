@@ -40,7 +40,7 @@ class MyApplication : Application() {
     override fun onCreate() {
         super.onCreate()
 
-        application = MyApplication()
+        application = this
 
         pm = applicationContext.packageManager
         executor = Executors.newCachedThreadPool()

@@ -4,6 +4,7 @@ import android.content.Context
 import android.provider.Settings
 import androidx.security.crypto.EncryptedSharedPreferences
 import androidx.security.crypto.MasterKey
+import androidx.preference.PreferenceManager
 import com.android.alftendev.MyApplication
 import java.util.UUID
 
@@ -38,10 +39,15 @@ object SyncPreferences {
         EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM
     )
 
-    fun isEnabled() = MyApplication.sharedPref.getBoolean(KEY_ENABLED, false)
-    fun serverUrl() = MyApplication.sharedPref.getString(KEY_SERVER_URL, "")?.trim()?.trimEnd('/').orEmpty()
-    fun wifiOnly() = MyApplication.sharedPref.getBoolean(KEY_WIFI_ONLY, false)
-    fun deviceName() = MyApplication.sharedPref.getString(KEY_DEVICE_NAME, android.os.Build.MODEL)?.trim().orEmpty()
+    private fun prefs() = PreferenceManager.getDefaultSharedPreferences(MyApplication.application)
+
+    fun isEnabled() = prefs().getBoolean(KEY_ENABLED, false)
+    fun setEnabled(value: Boolean) = prefs().edit().putBoolean(KEY_ENABLED, value).commit()
+    fun serverUrl() = prefs().getString(KEY_SERVER_URL, "")?.trim()?.trimEnd('/').orEmpty()
+    fun wifiOnly() = prefs().getBoolean(KEY_WIFI_ONLY, false)
+    fun setWifiOnly(value: Boolean) = prefs().edit().putBoolean(KEY_WIFI_ONLY, value).commit()
+    fun deviceName() = prefs().getString(KEY_DEVICE_NAME, android.os.Build.MODEL)?.trim().orEmpty()
+    fun retentionDays() = prefs().getString(KEY_RETENTION_DAYS, "0")?.toIntOrNull()?.coerceAtLeast(0) ?: 0
     fun token(context: Context) = secure(context).getString(TOKEN_KEY, "").orEmpty()
     fun setToken(context: Context, value: String) = secure(context).edit().putString(TOKEN_KEY, value.trim()).apply()
     fun hasToken(context: Context) = token(context).isNotBlank()
@@ -57,9 +63,8 @@ object SyncPreferences {
     }
 
     fun isExcluded(packageName: String): Boolean {
-        val configured = MyApplication.sharedPref.getString(KEY_EXCLUDED_PACKAGES, "").orEmpty()
+        val configured = prefs().getString(KEY_EXCLUDED_PACKAGES, "").orEmpty()
             .split(',', '\n').map(String::trim).filter(String::isNotBlank).toSet()
         return packageName in defaultExcluded || packageName in configured
     }
 }
-
